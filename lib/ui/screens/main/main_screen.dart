@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:krypto/ui/components/fab_button.dart';
 import 'package:krypto/ui/screens/main/config_tab_screen.dart';
 import 'package:krypto/ui/screens/main/pass_tab_screen.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -12,10 +15,25 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin<MainScreen> {
   List<AnimationController> _faders;
   AnimationController _hide;
+  var bannerController = (Platform.isAndroid || Platform.isIOS) ? BannerAdController() : null;
 
   @override
   void initState() {
     super.initState();
+
+    (Platform.isAndroid || Platform.isIOS)
+        ? bannerController.onEvent.listen((e) {
+            final event = e.keys.first;
+
+            switch (event) {
+              case BannerAdEvent.loaded:
+                break;
+              default:
+                break;
+            }
+          })
+        : bannerController = null;
+    (Platform.isAndroid || Platform.isIOS) ? bannerController.load() : bannerController = null;
 
     _hide = AnimationController(vsync: this, duration: kThemeAnimationDuration);
   }
@@ -24,6 +42,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin<M
   void dispose() {
     for (AnimationController controller in _faders) controller.dispose();
     _hide.dispose();
+    bannerController.dispose();
     super.dispose();
   }
 
@@ -81,6 +100,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin<M
               children: <Widget>[
                 PassTabScreen(),
                 ConfigTabScreen(),
+              ],
+            ),
+            endDrawer: Column(
+              children: [
+                Spacer(),
+                (Platform.isAndroid || Platform.isIOS)
+                    ? BannerAd(controller: bannerController)
+                    : SizedBox(
+                        height: 5,
+                      ),
               ],
             ),
             floatingActionButton: FabButton(),

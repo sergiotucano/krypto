@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,9 +9,15 @@ import 'package:krypto/ui/app_theme.dart';
 import 'package:get/get.dart';
 import 'package:krypto/ui/screens/screens.dart';
 import 'package:krypto/utils/app_utils.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    await MobileAds.initialize();
+    MobileAds.setTestDeviceIds(['1122860193590337~4380520679']);
+  }
   runApp(MyApp());
 }
 
